@@ -29,44 +29,44 @@ describe('test/components/Select.test.ts', () => {
         renderFixed={({position, children}) => (
           <span data-cy={`fixed-${position}`}>{children}</span>
         )}
-        renderMain={({id, ...props}) => (
-          <div data-cy="input" tabIndex={1}>
-            <Input
-              key={id}
-              value={props.value}
-              prefix={props.prefix}
-              suffix={props.suffix}
-              afterLabel={props.afterLabel}
-              beforeLabel={props.beforeLabel}
-              renderLabel={({children, position, id}) => (
-                <div key={`${id}_${position}_label`}>{children}</div>
-              )}
-              renderFixed={({children, position, id}) => (
-                <div key={`${id}_${position}_fixed`}>{children}</div>
-              )}
-              renderMain={({children}) => children}
-              renderContainer={({children}) => children}
-            />
-          </div>
+        renderMain={({id, onSelect, multiple, ...props}) => (
+          <Dropdown
+            menu={{items, onSelect, multiple}}
+            renderMain={() => (
+              <div
+                data-cy="menu"
+                tabIndex={1}
+                onClick={() => {
+                  onSelect?.({selectedKeys: ['item-1']});
+                }}
+              >
+                <div data-cy="input" tabIndex={1}>
+                  <Input
+                    key={id}
+                    value={props.value}
+                    prefix={props.prefix}
+                    suffix={props.suffix}
+                    afterLabel={props.afterLabel}
+                    beforeLabel={props.beforeLabel}
+                    renderLabel={({children, position, id}) => (
+                      <div key={`${id}_${position}_label`}>{children}</div>
+                    )}
+                    renderFixed={({children, position, id}) => (
+                      <div key={`${id}_${position}_fixed`}>{children}</div>
+                    )}
+                    renderMain={({children}) => children}
+                    renderContainer={({children}) => children}
+                  />
+                </div>
+                {<Menu items={items} />}
+              </div>
+            )}
+            renderContainer={({children}) => children}
+          />
         )}
         renderContainer={({children, items, onSelect, multiple}) => (
           <div data-cy="container" tabIndex={1}>
-            <Dropdown
-              menu={{items, onSelect, multiple}}
-              renderMain={() => (
-                <div
-                  data-cy="menu"
-                  tabIndex={1}
-                  onClick={() => {
-                    onSelect?.({selectedKeys: ['item-1']});
-                  }}
-                >
-                  {children}
-                  {<Menu items={items} />}
-                </div>
-              )}
-              renderContainer={({children}) => children}
-            />
+            {children}
           </div>
         )}
       />,
@@ -103,44 +103,44 @@ describe('test/components/Select.test.ts', () => {
         renderFixed={({position, children}) => (
           <span data-cy={`fixed-${position}`}>{children}</span>
         )}
-        renderMain={({id, ...props}) => (
-          <div data-cy="input" tabIndex={1}>
-            <Input
-              key={id}
-              value={props.value}
-              prefix={props.prefix}
-              suffix={props.suffix}
-              afterLabel={props.afterLabel}
-              beforeLabel={props.beforeLabel}
-              renderLabel={({children, position, id}) => (
-                <div key={`${id}_${position}_label`}>{children}</div>
-              )}
-              renderFixed={({children, position, id}) => (
-                <div key={`${id}_${position}_fixed`}>{children}</div>
-              )}
-              renderMain={({children}) => children}
-              renderContainer={({children}) => children}
-            />
-          </div>
+        renderMain={({id, onSelect, multiple, ...props}) => (
+          <Dropdown
+            menu={{items, onSelect, multiple}}
+            renderMain={() => (
+              <div
+                data-cy="menu"
+                tabIndex={1}
+                onClick={() => {
+                  onSelect?.({selectedKeys: ['item-1']});
+                }}
+              >
+                <div data-cy="input" tabIndex={1}>
+                  <Input
+                    key={id}
+                    value={props.value}
+                    prefix={props.prefix}
+                    suffix={props.suffix}
+                    afterLabel={props.afterLabel}
+                    beforeLabel={props.beforeLabel}
+                    renderLabel={({children, position, id}) => (
+                      <div key={`${id}_${position}_label`}>{children}</div>
+                    )}
+                    renderFixed={({children, position, id}) => (
+                      <div key={`${id}_${position}_fixed`}>{children}</div>
+                    )}
+                    renderMain={({children}) => children}
+                    renderContainer={({children}) => children}
+                  />
+                </div>
+                {<Menu items={items} />}
+              </div>
+            )}
+            renderContainer={({children}) => children}
+          />
         )}
         renderContainer={({children, items, onSelect, multiple}) => (
           <div data-cy="container" tabIndex={1}>
-            <Dropdown
-              menu={{items, onSelect, multiple}}
-              renderMain={() => (
-                <div
-                  data-cy="menu"
-                  tabIndex={1}
-                  onClick={() => {
-                    onSelect?.({selectedKeys: ['item-1']});
-                  }}
-                >
-                  {children}
-                  {<Menu items={items} />}
-                </div>
-              )}
-              renderContainer={({children}) => children}
-            />
+            {children}
           </div>
         )}
       />,
@@ -174,44 +174,44 @@ describe('test/components/Select.test.ts', () => {
         renderFixed={({position, children}) => (
           <span data-cy={`fixed-${position}`}>{children}</span>
         )}
-        renderMain={({id, ...props}) => (
-          <div data-cy="input" tabIndex={1}>
-            <Input
-              key={id}
-              value={props.value}
-              prefix={props.prefix}
-              suffix={props.suffix}
-              afterLabel={props.afterLabel}
-              beforeLabel={props.beforeLabel}
-              renderLabel={({children, position, id}) => (
-                <div key={`${id}_${position}_label`}>{children}</div>
-              )}
-              renderFixed={({children, position, id}) => (
-                <div key={`${id}_${position}_fixed`}>{children}</div>
-              )}
-              renderMain={({children}) => children}
-              renderContainer={({children}) => children}
-            />
-          </div>
+        renderMain={({id, onSelect, multiple, ...props}) => (
+          <Dropdown
+            menu={{items, onSelect, multiple}}
+            renderMain={() => (
+              <div
+                data-cy="menu"
+                tabIndex={1}
+                onClick={() => {
+                  onSelect?.({selectedKeys: ['item-1']});
+                }}
+              >
+                <div data-cy="input" tabIndex={1}>
+                  <Input
+                    key={id}
+                    value={props.value}
+                    prefix={props.prefix}
+                    suffix={props.suffix}
+                    afterLabel={props.afterLabel}
+                    beforeLabel={props.beforeLabel}
+                    renderLabel={({children, position, id}) => (
+                      <div key={`${id}_${position}_label`}>{children}</div>
+                    )}
+                    renderFixed={({children, position, id}) => (
+                      <div key={`${id}_${position}_fixed`}>{children}</div>
+                    )}
+                    renderMain={({children}) => children}
+                    renderContainer={({children}) => children}
+                  />
+                </div>
+                {<Menu items={items} />}
+              </div>
+            )}
+            renderContainer={({children}) => children}
+          />
         )}
         renderContainer={({children, items, onSelect, multiple}) => (
           <div data-cy="container" tabIndex={1}>
-            <Dropdown
-              menu={{items, onSelect, multiple}}
-              renderMain={() => (
-                <div
-                  data-cy="menu"
-                  tabIndex={1}
-                  onClick={() => {
-                    onSelect?.({selectedKeys: ['item-1']});
-                  }}
-                >
-                  {children}
-                  {<Menu items={items} />}
-                </div>
-              )}
-              renderContainer={({children}) => children}
-            />
+            {children}
           </div>
         )}
       />,
