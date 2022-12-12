@@ -59,12 +59,12 @@ export interface SelectProps<T> extends BaseSelectProps<T> {
   /**
    * Render the select main
    */
-  renderMain?: (props: SelectMainProps<T>) => ReactNode;
+  renderMain: (props: SelectMainProps<T>) => ReactNode;
 
   /**
    * Render the select container
    */
-  renderContainer?: (props: SelectContainerProps<T>) => ReactNode;
+  renderContainer: (props: SelectContainerProps<T>) => ReactNode;
 }
 
 export interface SelectChildrenProps<T>
@@ -172,7 +172,7 @@ const Select = <T extends HTMLElement>({
   const afterLabelNode =
     afterLabel && renderLabel?.({...childrenProps, position: 'after', children: afterLabel});
 
-  const main = renderMain?.({
+  const main = renderMain({
     ...childrenProps,
     ref,
     value: selectOptions.inputValue,
@@ -180,13 +180,12 @@ const Select = <T extends HTMLElement>({
     suffix: suffixNode,
     beforeLabel: beforeLabelNode,
     afterLabel: afterLabelNode,
+    onSelect: handleMenuSelect,
   });
 
-  const content = <>{main}</>;
-  const container = renderContainer?.({
+  const container = renderContainer({
     ...childrenProps,
-    children: content,
-    onSelect: handleMenuSelect,
+    children: main,
   });
 
   return <>{container}</>;

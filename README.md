@@ -48,8 +48,8 @@ Base select components that support React and React native
 | onPress | `(e: GestureResponderEvent) => void` | ✘ | This function is called when the select is pressed -- react native |
 | renderLabel | `(props: SelectLabelProps) => void` | ✘ | Render the select label |
 | renderFixed | `(props: SelectFixedProps) => void` | ✘ | Render the select fixed |
-| renderMain | `(props: SelectMainProps) => void` | ✘ | Render the select main |
-| renderContainer | `(props: SelectContainerProps) => void` | ✘ | Render the select container |
+| renderMain | `(props: SelectMainProps) => void` | ✔ | Render the select main |
+| renderContainer | `(props: SelectContainerProps) => void` | ✔ | Render the select container |
 
 ## Use
 
