@@ -22,12 +22,11 @@ export interface SelectOptions<E = unknown> extends Pick<BaseSelectProps, 'value
 /**
  * Base select props
  */
-export interface BaseSelectProps<T = HTMLElement>
-  extends Omit<
-    Omit<BaseDropdownProps<T> & BaseInputProps, 'onSelect' | 'prefix'> &
-      Pick<BaseInputProps, 'prefix'> &
-      Pick<BaseMenuProps<T>, 'multiple' | 'items'>,
-    'ref' | 'menu'
+export interface BaseSelectProps<T = HTMLInputElement>
+  extends Partial<
+    Omit<BaseDropdownProps<T> & BaseInputProps<T>, 'onSelect' | 'prefix'> &
+      Pick<BaseInputProps<T>, 'prefix'> &
+      Pick<BaseMenuProps<T>, 'multiple' | 'items'>
   > {
   /**
    * Custom ref
@@ -81,7 +80,7 @@ export type SelectLabelProps<T> = SelectFixedProps<T>;
 export type SelectMainProps<T> = SelectChildrenProps<T> & Pick<BaseSelectProps<T>, 'ref'>;
 export type SelectContainerProps<T> = SelectChildrenProps<T>;
 
-const Select = <T extends HTMLElement>({
+const Select = <T extends HTMLInputElement>({
   ref,
   items = [],
   value,
