@@ -1,13 +1,14 @@
-import {useState, useEffect, useId, useCallback, Ref, ReactNode} from 'react';
-import {BaseInputProps, InputFixedProps} from '@bearei/react-input';
-import {BaseDropdownProps} from '@bearei/react-dropdown';
-import {MenuOptions, BaseMenuProps} from '@bearei/react-menu';
-import * as array from '@bearei/react-util/lib/array';
+import type { BaseDropdownProps } from '@bearei/react-dropdown';
+import type { BaseInputProps, InputFixedProps } from '@bearei/react-input';
+import type { BaseMenuProps, MenuOptions } from '@bearei/react-menu';
+import * as array from '@bearei/react-util/lib/commonjs/array';
+import { ReactNode, Ref, useCallback, useEffect, useId, useState } from 'react';
 
 /**
  * Select options
  */
-export interface SelectOptions<E = unknown> extends Pick<BaseSelectProps, 'value'> {
+export interface SelectOptions<T, E = unknown>
+  extends Pick<BaseSelectProps<T>, 'value'> {
   /**
    * Select the value that input will display when you are done
    */
@@ -22,7 +23,7 @@ export interface SelectOptions<E = unknown> extends Pick<BaseSelectProps, 'value
 /**
  * Base select props
  */
-export interface BaseSelectProps<T = HTMLInputElement>
+export interface BaseSelectProps<T>
   extends Partial<
     Omit<BaseDropdownProps<T> & BaseInputProps<T>, 'onSelect' | 'prefix'> &
       Pick<BaseInputProps<T>, 'prefix'> &
@@ -36,7 +37,7 @@ export interface BaseSelectProps<T = HTMLInputElement>
   /**
    * This function is called when the select value changes
    */
-  onSelect?: <E>(options: SelectOptions<E>) => void;
+  onSelect?: <E>(options: SelectOptions<T, E>) => void;
 
   /**
    * Call back this function when the select value changes
@@ -67,7 +68,10 @@ export interface SelectProps<T> extends BaseSelectProps<T> {
 }
 
 export interface SelectChildrenProps<T>
-  extends Omit<Omit<BaseSelectProps<T>, 'onSelect'> & Pick<BaseMenuProps, 'onSelect'>, 'ref'> {
+  extends Omit<
+    Omit<BaseSelectProps<T>, 'onSelect'> & Pick<BaseMenuProps<T>, 'onSelect'>,
+    'ref'
+  > {
   /**
    * Component unique ID
    */
@@ -75,12 +79,16 @@ export interface SelectChildrenProps<T>
   children?: ReactNode;
 }
 
-export type SelectFixedProps<T> = SelectChildrenProps<T> & Pick<InputFixedProps, 'position'>;
+export type SelectFixedProps<T> = SelectChildrenProps<T> &
+  Pick<InputFixedProps<T>, 'position'>;
+
 export type SelectLabelProps<T> = SelectFixedProps<T>;
-export type SelectMainProps<T> = SelectChildrenProps<T> & Pick<BaseSelectProps<T>, 'ref'>;
+export type SelectMainProps<T> = SelectChildrenProps<T> &
+  Pick<BaseSelectProps<T>, 'ref'>;
+
 export type SelectContainerProps<T> = SelectChildrenProps<T>;
 
-const Select = <T extends HTMLInputElement>({
+const Select = <T extends HTMLInputElement = HTMLInputElement>({
   ref,
   items = [],
   value,
@@ -100,11 +108,14 @@ const Select = <T extends HTMLInputElement>({
 }: SelectProps<T>) => {
   const id = useId();
   const [status, setStatus] = useState('idle');
-  const [selectOptions, setSelectOptions] = useState<SelectOptions>({value: '', inputValue: ''});
-  const childrenProps = {...args, id, multiple, items};
+  const [selectOptions, setSelectOptions] = useState<SelectOptions<T>>({
+    value: '',
+    inputValue: '',
+  });
 
+  const childrenProps = { ...args, id, multiple, items };
   const handleSelectOptionsChange = useCallback(
-    <E,>(options: SelectOptions<E>) => {
+    <E,>(options: SelectOptions<T, E>) => {
       onSelect?.(options);
       onValueChange?.(options.value);
     },
@@ -112,7 +123,7 @@ const Select = <T extends HTMLInputElement>({
   );
 
   const handleMenuSelect = useCallback(
-    ({selectedKeys = [], event}: MenuOptions) => {
+    ({ selectedKeys = [], event }: MenuOptions<T>) => {
       const handleInputValue = (keys: string | string[]) => {
         const handleMultiple = () =>
           Array.isArray(keys)
@@ -121,13 +132,18 @@ const Select = <T extends HTMLInputElement>({
                 .filter(e => e) as string[])
             : [];
 
-        const handleSingle = () => items.find(item => item.key && keys.includes(item.key))?.label;
+        const handleSingle = () =>
+          items.find(item => item.key && keys.includes(item.key))?.label;
 
         return multiple ? handleMultiple() : handleSingle();
       };
 
       const value = multiple ? selectedKeys : selectedKeys[0];
-      const options = {value, event, inputValue: handleInputValue(selectedKeys)};
+      const options = {
+        value,
+        event,
+        inputValue: handleInputValue(selectedKeys),
+      };
 
       setSelectOptions(options);
       handleSelectOptionsChange(options);
@@ -146,19 +162,23 @@ const Select = <T extends HTMLInputElement>({
             : currentOptions.value !== nextValue && status === 'succeeded';
 
         isUpdate &&
-          handleMenuSelect({selectedKeys: Array.isArray(nextValue) ? nextValue : [nextValue]});
+          handleMenuSelect({
+            selectedKeys: Array.isArray(nextValue) ? nextValue : [nextValue],
+          });
 
-        return {value: nextValue};
+        return { value: nextValue };
       });
 
     status === 'idle' && setStatus('succeeded');
   }, [defaultValue, handleMenuSelect, status, value]);
 
   const prefixNode =
-    prefix && renderFixed?.({...childrenProps, position: 'before', children: prefix});
+    prefix &&
+    renderFixed?.({ ...childrenProps, position: 'before', children: prefix });
 
   const suffixNode =
-    suffix && renderFixed?.({...childrenProps, position: 'after', children: suffix});
+    suffix &&
+    renderFixed?.({ ...childrenProps, position: 'after', children: suffix });
 
   const beforeLabelNode =
     beforeLabel &&
@@ -169,7 +189,12 @@ const Select = <T extends HTMLInputElement>({
     });
 
   const afterLabelNode =
-    afterLabel && renderLabel?.({...childrenProps, position: 'after', children: afterLabel});
+    afterLabel &&
+    renderLabel?.({
+      ...childrenProps,
+      position: 'after',
+      children: afterLabel,
+    });
 
   const main = renderMain({
     ...childrenProps,
