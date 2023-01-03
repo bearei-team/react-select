@@ -10,10 +10,10 @@ Base select components that support React and React native
 
 #### Select Options
 
-| Name  |      Type | Required | Description                                    |
-| :---- | --------: | -------: | :--------------------------------------------- |
-| value |  `string` |        ✘ | Select value                                   |
-| event | `unknown` |        ✘ | Triggers an event when a select option changes |
+| Name | Type | Required | Description |
+| :-- | --: | --: | :-- |
+| value | `string` | ✘ | Select value |
+| event | `unknown` | ✘ | Triggers an event when a select option changes |
 
 #### Select
 
@@ -62,9 +62,9 @@ import Dropdown from '@bearei/react-dropdown';
 import Menu from '@bearei/react-menu';
 
 const items = [
-  {label: 'label1', key: 'item-1'},
-  {label: 'label2', key: 'item-2'},
-  {label: 'label3', key: 'item-3'},
+  { label: 'label1', key: 'item-1' },
+  { label: 'label2', key: 'item-2' },
+  { label: 'label3', key: 'item-3' },
 ];
 
 const select = (
@@ -75,9 +75,9 @@ const select = (
     beforeLabel="before"
     items={items}
     defaultValue={[]}
-    renderLabel={({position, children}) => <span>{children}</span>}
-    renderFixed={({position, children}) => <span>{children}</span>}
-    renderMain={({id, ...props}) => (
+    renderLabel={({ position, children }) => <span>{children}</span>}
+    renderFixed={({ position, children }) => <span>{children}</span>}
+    renderMain={({ id, ...props }) => (
       <div tabIndex={1}>
         <Input
           key={id}
@@ -86,28 +86,28 @@ const select = (
           suffix={props.suffix}
           afterLabel={props.afterLabel}
           beforeLabel={props.beforeLabel}
-          renderLabel={({children, position, id}) => (
+          renderLabel={({ children, position, id }) => (
             <div key={`${id}_${position}_label`}>{children}</div>
           )}
-          renderFixed={({children, position}) => (
+          renderFixed={({ children, position }) => (
             <div key={`${id}_${position}_fixed`}>{children}</div>
           )}
-          renderMain={({children}) => children}
-          renderContainer={({children}) => children}
+          renderMain={({ children }) => children}
+          renderContainer={({ children }) => children}
         />
       </div>
     )}
-    renderContainer={({children, items, onSelect, multiple}) => (
+    renderContainer={({ children, items, onSelect, multiple }) => (
       <div tabIndex={1}>
         <Dropdown
-          menu={{items, onSelect, multiple}}
+          menu={{ items, onSelect, multiple }}
           renderMain={() => (
             <div tabIndex={1}>
               {children}
               {<Menu items={items} />}
             </div>
           )}
-          renderContainer={({children}) => children}
+          renderContainer={({ children }) => children}
         />
       </div>
     )}
