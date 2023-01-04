@@ -1555,7 +1555,7 @@ __metadata:
     "@bearei/react-dropdown": ^0.0.19
     "@bearei/react-input": ^0.0.27
     "@bearei/react-menu": ^0.0.28
-    "@bearei/react-util": ^0.0.28
+    "@bearei/react-util": ^0.0.29
     "@testing-library/dom": ^8.19.0
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.4.0
@@ -1597,13 +1597,6 @@ __metadata:
     webpack-dev-server: ^4.11.1
   languageName: unknown
   linkType: soft
-
-"@bearei/react-util@npm:^0.0.28":
-  version: 0.0.28
-  resolution: "@bearei/react-util@npm:0.0.28"
-  checksum: 694df5cb7abfac2f0ea6d962f97ef149231516c8386ff7934e0d64d8c7230fa1d7d528866f88a017c6e8e62b03837ad467555f7d4eee59c6087d7d47545422f2
-  languageName: node
-  linkType: hard
 
 "@bearei/react-util@npm:^0.0.29":
   version: 0.0.29
