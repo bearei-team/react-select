@@ -1515,33 +1515,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bearei/react-dropdown@npm:^0.0.17":
-  version: 0.0.17
-  resolution: "@bearei/react-dropdown@npm:0.0.17"
+"@bearei/react-dropdown@npm:^0.0.19":
+  version: 0.0.19
+  resolution: "@bearei/react-dropdown@npm:0.0.19"
   dependencies:
-    "@bearei/react-util": ^0.0.28
+    "@bearei/react-util": ^0.0.29
     react: ^18.2.0
-  checksum: 628529b4aaee7597971434e29736ec6b6f1ec7ee56f2bd47efcdeabf8efa17db45918e3d510cf4a53b4fcd1e183c7982105000b7914a3919cc0a9ddbb1595729
+  checksum: 888ccfe82dfb992eb6d3db5d07da8fa722160e83ad75c8cdb4cd0ec6cd6f7d72384e686d8d8da177e7e94ac4d11a6e3e3140e0b80a5edb8d8d7481acc3fd7038
   languageName: node
   linkType: hard
 
-"@bearei/react-input@npm:^0.0.25":
-  version: 0.0.25
-  resolution: "@bearei/react-input@npm:0.0.25"
+"@bearei/react-input@npm:^0.0.27":
+  version: 0.0.27
+  resolution: "@bearei/react-input@npm:0.0.27"
   dependencies:
-    "@bearei/react-util": ^0.0.28
+    "@bearei/react-util": ^0.0.29
     react: ^18.2.0
-  checksum: 4f70a17cc01f3836fbcf07e4cb262e4c9c9c21c232c995841885d61d824939c4052833df03f65ccc1b1dbbe65bef7f6346d8588680d89b4d1f6e9ba498b69027
+  checksum: 6d0a0ca2e666292c34b00c0738091193830eb1032cf982821ac5dcaa136b8f680702e5b8f7665620296603522afbc118ebb1bb2b74a7d19668fd2877ba30a3e7
   languageName: node
   linkType: hard
 
-"@bearei/react-menu@npm:^0.0.26":
-  version: 0.0.26
-  resolution: "@bearei/react-menu@npm:0.0.26"
+"@bearei/react-menu@npm:^0.0.28":
+  version: 0.0.28
+  resolution: "@bearei/react-menu@npm:0.0.28"
   dependencies:
-    "@bearei/react-util": ^0.0.28
+    "@bearei/react-util": ^0.0.29
     react: ^18.2.0
-  checksum: 420c641ff90f29a5d5882afcfced79c4296701ef890e032a61e44f2e6be83769c86bcdd0c9b6716c1d1592466fcb37b92813bc7d0938876d3345165ab39fbbd7
+  checksum: 0f20ac2373174042ca1af36c77f86126661d7f9d48d9c7055f1bcc59040a19aa179fdfe143fa17ab8a7f1a1cae88f58f91e6abbd9ac879a058d45020679bf22c
   languageName: node
   linkType: hard
 
@@ -1552,9 +1552,9 @@ __metadata:
     "@babel/core": ^7.20.2
     "@babel/preset-env": ^7.20.2
     "@babel/preset-react": ^7.18.6
-    "@bearei/react-dropdown": ^0.0.17
-    "@bearei/react-input": ^0.0.25
-    "@bearei/react-menu": ^0.0.26
+    "@bearei/react-dropdown": ^0.0.19
+    "@bearei/react-input": ^0.0.27
+    "@bearei/react-menu": ^0.0.28
     "@bearei/react-util": ^0.0.28
     "@testing-library/dom": ^8.19.0
     "@testing-library/jest-dom": ^5.16.5
@@ -1602,6 +1602,13 @@ __metadata:
   version: 0.0.28
   resolution: "@bearei/react-util@npm:0.0.28"
   checksum: 694df5cb7abfac2f0ea6d962f97ef149231516c8386ff7934e0d64d8c7230fa1d7d528866f88a017c6e8e62b03837ad467555f7d4eee59c6087d7d47545422f2
+  languageName: node
+  linkType: hard
+
+"@bearei/react-util@npm:^0.0.29":
+  version: 0.0.29
+  resolution: "@bearei/react-util@npm:0.0.29"
+  checksum: 0015c16f7b498a7d90426d44fc23b6e4afd427d0852ff1bda66814c20759d47cc17ce31de0f5817611902d8e35292fe14ed588caf699c581c23f29d1ceee776e
   languageName: node
   linkType: hard
 
