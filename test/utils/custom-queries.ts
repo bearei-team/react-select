@@ -1,8 +1,8 @@
 import {
-  buildQueries,
-  Matcher,
-  MatcherOptions,
-  queryHelpers,
+    buildQueries,
+    Matcher,
+    MatcherOptions,
+    queryHelpers
 } from '@testing-library/react';
 
 // The queryAllByAttribute is a shortcut for attribute-based matchers
@@ -29,10 +29,11 @@ const [
 ] = buildQueries(queryAllByDataCy, getMultipleError, getMissingError);
 
 export {
-  queryByDataCy,
-  queryAllByDataCy,
-  getByDataCy,
-  getAllByDataCy,
-  findAllByDataCy,
-  findByDataCy,
+    queryByDataCy,
+    queryAllByDataCy,
+    getByDataCy,
+    getAllByDataCy,
+    findAllByDataCy,
+    findByDataCy,
 };
+

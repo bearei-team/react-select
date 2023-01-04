@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Select from '../../src/components/Select';
-import { render } from '../utils/test_utils';
+import { render } from '../utils/test-utils';
 
 const items = [
   { label: 'label1', key: 'item-1' },
