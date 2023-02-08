@@ -31,6 +31,7 @@ Base select components that support React and React native
 | size | `small` `medium` `large` | ✘ | Select size |
 | shape | `square` `circle` `round` | ✘ | Select shape |
 | status | `normal` `error` `warning` | ✘ | Select status |
+| type | `dropdown` `modal` | ✘ | Select type |
 | onSelect | `(options: SelectOptions) => void` | ✘ | This function is called when the select option changes |
 | onFocus | `(e: React.FocusEvent) => void` | ✘ | This function is called when the select gets the focus |
 | onBlur | `(e: React.FocusEvent) => void` | ✘ | This function is called when the select loses focus |

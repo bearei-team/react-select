@@ -35,6 +35,11 @@ export interface BaseSelectProps<T>
   ref?: Ref<T>;
 
   /**
+   * Selector type
+   */
+  type?: 'dropdown' | 'modal';
+
+  /**
    * This function is called when the select value changes
    */
   onSelect?: <E>(options: SelectOptions<T, E>) => void;
