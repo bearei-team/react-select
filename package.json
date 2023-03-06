@@ -1,6 +1,6 @@
 {
   "name": "@bearei/react-select",
-  "version": "0.0.10",
+  "version": "0.0.16",
   "main": "./lib/commonjs/index",
   "module": "./lib/module/index",
   "types": "./lib/commonjs/index.d.ts",

@@ -1,7 +1,6 @@
 import type { BaseDropdownProps } from '@bearei/react-dropdown';
 import type { BaseInputProps, InputFixedProps } from '@bearei/react-input';
 import type { BaseMenuProps, MenuOptions } from '@bearei/react-menu';
-import * as array from '@bearei/react-util/lib/commonjs/array';
 import { ReactNode, Ref, useCallback, useEffect, useId, useState } from 'react';
 
 /**
@@ -12,7 +11,7 @@ export interface SelectOptions<T, E = unknown>
   /**
    * Select the value that input will display when you are done
    */
-  inputValue?: string | string[];
+  label?: string | string[];
 
   /**
    * Triggers an event when a select option changes
@@ -27,7 +26,10 @@ export interface BaseSelectProps<T>
   extends Partial<
     Omit<BaseDropdownProps<T> & BaseInputProps<T>, 'onSelect' | 'prefix'> &
       Pick<BaseInputProps<T>, 'prefix'> &
-      Pick<BaseMenuProps<T>, 'multiple' | 'items'>
+      Pick<
+        BaseMenuProps<T>,
+        'multiple' | 'items' | 'selectedKeys' | 'defaultSelectedKeys'
+      >
   > {
   /**
    * Custom ref
@@ -37,7 +39,7 @@ export interface BaseSelectProps<T>
   /**
    * Selector type
    */
-  type?: 'dropdown' | 'modal';
+  type?: 'dropdown' | 'modal' | 'cascade';
 
   /**
    * This function is called when the select value changes
@@ -95,19 +97,20 @@ export type SelectContainerProps<T> = SelectChildrenProps<T>;
 
 const Select = <T extends HTMLInputElement = HTMLInputElement>({
   ref,
+  type,
   items = [],
-  value,
   prefix,
   suffix,
   multiple,
   afterLabel,
   beforeLabel,
-  defaultValue,
+  selectedKeys,
+  defaultSelectedKeys,
   onSelect,
   onValueChange,
+  renderMain,
   renderFixed,
   renderLabel,
-  renderMain,
   renderContainer,
   ...args
 }: SelectProps<T>) => {
@@ -115,10 +118,20 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
   const [status, setStatus] = useState('idle');
   const [selectOptions, setSelectOptions] = useState<SelectOptions<T>>({
     value: '',
-    inputValue: '',
+    label: '',
   });
 
-  const childrenProps = { ...args, id, multiple, items };
+  const childrenProps = {
+    ...args,
+    id,
+    type,
+    items,
+    multiple,
+    selectedKeys: (Array.isArray(selectOptions.value)
+      ? selectOptions.value
+      : [selectOptions.value]) as string[],
+  };
+
   const handleSelectOptionsChange = useCallback(
     <E,>(options: SelectOptions<T, E>) => {
       onSelect?.(options);
@@ -127,55 +140,75 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
     [onSelect, onValueChange],
   );
 
-  const handleMenuSelect = useCallback(
-    ({ selectedKeys = [], event }: MenuOptions<T>) => {
-      const handleInputValue = (keys: string | string[]) => {
-        const handleMultiple = () =>
-          Array.isArray(keys)
-            ? (keys
-                .map(key => items.find(menu => menu.key === key)?.label)
-                .filter(e => e) as string[])
-            : [];
+  const handleLabel = useCallback(
+    (keys: string | string[]) => {
+      const handleMultiple = () =>
+        Array.isArray(keys)
+          ? (keys
+              .map(key => items.find(menu => menu.key === key)?.label)
+              .filter(e => e) as string[])
+          : [];
 
-        const handleSingle = () =>
-          items.find(item => item.key && keys.includes(item.key))?.label;
+      const handleSingle = () =>
+        items.find(item => item.key && keys.includes(item.key))?.label;
 
-        return multiple ? handleMultiple() : handleSingle();
+      const handleCascade = () => {
+        const findLabel = (
+          items = [] as BaseMenuProps<T>['items'],
+          labels = [] as string[],
+        ): string[] =>
+          items!
+            .map(({ key, label: itemLabel, children }) => {
+              const label = keys.includes(key!) ? itemLabel : undefined;
+              const nextLabels = [...labels, label].filter(e => e) as string[];
+
+              return children ? findLabel(children, nextLabels) : nextLabels;
+            })
+            .flat();
+
+        return findLabel(items);
       };
 
+      if (type === 'cascade') {
+        return handleCascade();
+      }
+
+      return multiple ? handleMultiple() : handleSingle();
+    },
+    [items, multiple, type],
+  );
+
+  const handleMenuSelect = useCallback(
+    ({ selectedKeys = [], event }: MenuOptions<T>) => {
       const value = multiple ? selectedKeys : selectedKeys[0];
       const options = {
         value,
         event,
-        inputValue: handleInputValue(selectedKeys),
+        label: handleLabel(selectedKeys),
       };
 
       setSelectOptions(options);
       handleSelectOptionsChange(options);
     },
-    [handleSelectOptionsChange, items, multiple],
+    [handleLabel, handleSelectOptionsChange, multiple],
   );
 
   useEffect(() => {
-    const nextValue = status !== 'idle' ? value : defaultValue ?? value;
+    const nextValue =
+      status !== 'idle' ? selectedKeys : defaultSelectedKeys ?? selectedKeys;
 
     nextValue &&
       setSelectOptions(currentOptions => {
         const isUpdate =
-          Array.isArray(nextValue) && Array.isArray(currentOptions.value)
-            ? !array.isEqual(currentOptions.value, nextValue)
-            : currentOptions.value !== nextValue && status === 'succeeded';
+          currentOptions.value !== nextValue && status === 'succeeded';
 
-        isUpdate &&
-          handleMenuSelect({
-            selectedKeys: Array.isArray(nextValue) ? nextValue : [nextValue],
-          });
+        isUpdate && handleMenuSelect({ selectedKeys: nextValue });
 
         return { value: nextValue };
       });
 
     status === 'idle' && setStatus('succeeded');
-  }, [defaultValue, handleMenuSelect, status, value]);
+  }, [defaultSelectedKeys, handleMenuSelect, selectedKeys, status]);
 
   const prefixNode =
     prefix &&
@@ -204,7 +237,7 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
   const main = renderMain({
     ...childrenProps,
     ref,
-    value: selectOptions.inputValue,
+    value: selectOptions.label,
     prefix: prefixNode,
     suffix: suffixNode,
     beforeLabel: beforeLabelNode,
