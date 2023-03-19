@@ -10,7 +10,13 @@ const items = [
   {
     label: 'label1',
     key: 'item-1',
-    children: [{ label: 'label1-1', key: 'item-1-1' }],
+    children: [
+      {
+        label: 'label1-1',
+        key: 'item-1-1',
+        children: [{ label: 'label1-1-1', key: 'item-1-1-1' }],
+      },
+    ],
   },
   { label: 'label2', key: 'item-2' },
   { label: 'label3', key: 'item-3' },
@@ -175,7 +181,7 @@ describe('test/components/Select.test.ts', () => {
     );
 
     await user.click(getByDataCy('menu'));
-    expect(value).toEqual('item-1');
+    expect(value).toEqual(['item-1']);
     expect(label).toEqual('label1');
   });
 
@@ -294,7 +300,9 @@ describe('test/components/Select.test.ts', () => {
                 data-cy="menu"
                 tabIndex={1}
                 onClick={() => {
-                  onSelect?.({ selectedKeys: ['item-1', 'item-1-1'] });
+                  onSelect?.({
+                    selectedKeys: ['item-1', 'item-1-1', 'item-1-1-1'],
+                  });
                 }}
               >
                 <div data-cy="input" tabIndex={1}>
@@ -343,7 +351,7 @@ describe('test/components/Select.test.ts', () => {
 
     await user.click(getByDataCy('menu'));
 
-    expect(value).toEqual(['item-1', 'item-1-1']);
-    expect(label).toEqual(['label1', 'label1-1']);
+    expect(value).toEqual(['item-1', 'item-1-1', 'item-1-1-1']);
+    expect(label).toEqual(['label1', 'label1-1', 'label1-1-1']);
   });
 });

@@ -1,22 +1,19 @@
 import type { BaseDropdownProps } from '@bearei/react-dropdown';
 import type { BaseInputProps, InputFixedProps } from '@bearei/react-input';
 import type { BaseMenuProps, MenuOptions } from '@bearei/react-menu';
+import * as array from '@bearei/react-util/lib/commonjs/array';
 import { ReactNode, Ref, useCallback, useEffect, useId, useState } from 'react';
 
 /**
  * Select options
  */
-export interface SelectOptions<T, E = unknown>
-  extends Pick<BaseSelectProps<T>, 'value'> {
+export interface SelectOptions {
+  value?: string[];
+
   /**
    * Select the value that input will display when you are done
    */
   label?: string | string[];
-
-  /**
-   * Triggers an event when a select option changes
-   */
-  event?: E;
 }
 
 /**
@@ -44,7 +41,7 @@ export interface BaseSelectProps<T>
   /**
    * This function is called when the select value changes
    */
-  onSelect?: <E>(options: SelectOptions<T, E>) => void;
+  onSelect?: (options: SelectOptions) => void;
 
   /**
    * Call back this function when the select value changes
@@ -116,8 +113,8 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
 }: SelectProps<T>) => {
   const id = useId();
   const [status, setStatus] = useState('idle');
-  const [selectOptions, setSelectOptions] = useState<SelectOptions<T>>({
-    value: '',
+  const [selectOptions, setSelectOptions] = useState<SelectOptions>({
+    value: [],
     label: '',
   });
 
@@ -127,13 +124,11 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
     type,
     items,
     multiple,
-    selectedKeys: (Array.isArray(selectOptions.value)
-      ? selectOptions.value
-      : [selectOptions.value]) as string[],
+    selectedKeys: selectOptions.value,
   };
 
   const handleSelectOptionsChange = useCallback(
-    <E,>(options: SelectOptions<T, E>) => {
+    (options: SelectOptions) => {
       onSelect?.(options);
       onValueChange?.(options.value);
     },
@@ -141,13 +136,11 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
   );
 
   const handleLabel = useCallback(
-    (keys: string | string[]) => {
+    (keys: string[]) => {
       const handleMultiple = () =>
-        Array.isArray(keys)
-          ? (keys
-              .map(key => items.find(menu => menu.key === key)?.label)
-              .filter(e => e) as string[])
-          : [];
+        keys
+          .map(key => items.find(menu => menu.key === key)?.label)
+          .filter(e => e) as string[];
 
       const handleSingle = () =>
         items.find(item => item.key && keys.includes(item.key))?.label;
@@ -160,13 +153,15 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
           items!
             .map(({ key, label: itemLabel, children }) => {
               const label = keys.includes(key!) ? itemLabel : undefined;
-              const nextLabels = [...labels, label].filter(e => e) as string[];
+              const nextLabels = label ? [...labels, label] : labels;
 
-              return children ? findLabel(children, nextLabels) : nextLabels;
+              return children && label
+                ? findLabel(children, nextLabels)
+                : nextLabels;
             })
             .flat();
 
-        return findLabel(items);
+        return [...new Set(findLabel(items))];
       };
 
       if (type === 'cascade') {
@@ -179,36 +174,17 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
   );
 
   const handleMenuSelect = useCallback(
-    ({ selectedKeys = [], event }: MenuOptions<T>) => {
-      const value = multiple ? selectedKeys : selectedKeys[0];
+    ({ selectedKeys = [] }: MenuOptions<T>) => {
       const options = {
-        value,
-        event,
+        value: selectedKeys,
         label: handleLabel(selectedKeys),
       };
 
       setSelectOptions(options);
       handleSelectOptionsChange(options);
     },
-    [handleLabel, handleSelectOptionsChange, multiple],
+    [handleLabel, handleSelectOptionsChange],
   );
-
-  useEffect(() => {
-    const nextValue =
-      status !== 'idle' ? selectedKeys : defaultSelectedKeys ?? selectedKeys;
-
-    nextValue &&
-      setSelectOptions(currentOptions => {
-        const isUpdate =
-          currentOptions.value !== nextValue && status === 'succeeded';
-
-        isUpdate && handleMenuSelect({ selectedKeys: nextValue });
-
-        return { value: nextValue };
-      });
-
-    status === 'idle' && setStatus('succeeded');
-  }, [defaultSelectedKeys, handleMenuSelect, selectedKeys, status]);
 
   const prefixNode =
     prefix &&
@@ -249,6 +225,32 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
     ...childrenProps,
     children: main,
   });
+
+  useEffect(() => {
+    const nextValue =
+      status !== 'idle' ? selectedKeys : defaultSelectedKeys ?? selectedKeys;
+
+    if (typeof nextValue !== 'undefined') {
+      setSelectOptions(currentlySelectOptions => {
+        const isUpdate = !array.isEqual(
+          currentlySelectOptions.value!,
+          nextValue,
+        );
+
+        return isUpdate
+          ? { value: nextValue, label: handleLabel(nextValue) }
+          : currentlySelectOptions;
+      });
+    }
+
+    status === 'idle' && setStatus('succeeded');
+  }, [
+    defaultSelectedKeys,
+    handleLabel,
+    handleMenuSelect,
+    selectedKeys,
+    status,
+  ]);
 
   return <>{container}</>;
 };
