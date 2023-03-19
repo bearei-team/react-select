@@ -7,17 +7,13 @@ import { ReactNode, Ref, useCallback, useEffect, useId, useState } from 'react';
 /**
  * Select options
  */
-export interface SelectOptions<T, E = unknown>
-  extends Pick<BaseSelectProps<T>, 'value'> {
+export interface SelectOptions {
+  value?: string[];
+
   /**
    * Select the value that input will display when you are done
    */
-  inputValue?: string | string[];
-
-  /**
-   * Triggers an event when a select option changes
-   */
-  event?: E;
+  label?: string | string[];
 }
 
 /**
@@ -27,7 +23,10 @@ export interface BaseSelectProps<T>
   extends Partial<
     Omit<BaseDropdownProps<T> & BaseInputProps<T>, 'onSelect' | 'prefix'> &
       Pick<BaseInputProps<T>, 'prefix'> &
-      Pick<BaseMenuProps<T>, 'multiple' | 'items'>
+      Pick<
+        BaseMenuProps<T>,
+        'multiple' | 'items' | 'selectedKeys' | 'defaultSelectedKeys'
+      >
   > {
   /**
    * Custom ref
@@ -37,12 +36,12 @@ export interface BaseSelectProps<T>
   /**
    * Selector type
    */
-  type?: 'dropdown' | 'modal';
+  type?: 'dropdown' | 'modal' | 'cascade';
 
   /**
    * This function is called when the select value changes
    */
-  onSelect?: <E>(options: SelectOptions<T, E>) => void;
+  onSelect?: (options: SelectOptions) => void;
 
   /**
    * Call back this function when the select value changes
@@ -95,87 +94,97 @@ export type SelectContainerProps<T> = SelectChildrenProps<T>;
 
 const Select = <T extends HTMLInputElement = HTMLInputElement>({
   ref,
+  type,
   items = [],
-  value,
   prefix,
   suffix,
   multiple,
   afterLabel,
   beforeLabel,
-  defaultValue,
+  selectedKeys,
+  defaultSelectedKeys,
   onSelect,
   onValueChange,
+  renderMain,
   renderFixed,
   renderLabel,
-  renderMain,
   renderContainer,
   ...args
 }: SelectProps<T>) => {
   const id = useId();
   const [status, setStatus] = useState('idle');
-  const [selectOptions, setSelectOptions] = useState<SelectOptions<T>>({
-    value: '',
-    inputValue: '',
+  const [selectOptions, setSelectOptions] = useState<SelectOptions>({
+    value: [],
+    label: '',
   });
 
-  const childrenProps = { ...args, id, multiple, items };
+  const childrenProps = {
+    ...args,
+    id,
+    type,
+    items,
+    multiple,
+    selectedKeys: selectOptions.value,
+  };
+
   const handleSelectOptionsChange = useCallback(
-    <E,>(options: SelectOptions<T, E>) => {
+    (options: SelectOptions) => {
       onSelect?.(options);
       onValueChange?.(options.value);
     },
     [onSelect, onValueChange],
   );
 
-  const handleMenuSelect = useCallback(
-    ({ selectedKeys = [], event }: MenuOptions<T>) => {
-      const handleInputValue = (keys: string | string[]) => {
-        const handleMultiple = () =>
-          Array.isArray(keys)
-            ? (keys
-                .map(key => items.find(menu => menu.key === key)?.label)
-                .filter(e => e) as string[])
-            : [];
+  const handleLabel = useCallback(
+    (keys: string[]) => {
+      const handleMultiple = () =>
+        keys
+          .map(key => items.find(menu => menu.key === key)?.label)
+          .filter(e => e) as string[];
 
-        const handleSingle = () =>
-          items.find(item => item.key && keys.includes(item.key))?.label;
+      const handleSingle = () =>
+        items.find(item => item.key && keys.includes(item.key))?.label;
 
-        return multiple ? handleMultiple() : handleSingle();
+      const handleCascade = () => {
+        const findLabel = (
+          items = [] as BaseMenuProps<T>['items'],
+          labels = [] as string[],
+        ): string[] =>
+          items!
+            .map(({ key, label: itemLabel, children }) => {
+              const label = keys.includes(key!) ? itemLabel : undefined;
+              const nextLabels = label ? [...labels, label] : labels;
+
+              return children && label
+                ? findLabel(children, nextLabels)
+                : nextLabels;
+            })
+            .flat();
+
+        return [...new Set(findLabel(items))];
       };
 
-      const value = multiple ? selectedKeys : selectedKeys[0];
+      if (type === 'cascade') {
+        return handleCascade();
+      }
+
+      return multiple ? handleMultiple() : handleSingle();
+    },
+    [items, multiple, type],
+  );
+
+  const handleMenuSelect = useCallback(
+    ({ selectedKeys = [] }: MenuOptions<T>) => {
       const options = {
-        value,
-        event,
-        inputValue: handleInputValue(selectedKeys),
+        value: selectedKeys,
+        label: handleLabel(selectedKeys),
       };
 
       setSelectOptions(options);
       handleSelectOptionsChange(options);
     },
-    [handleSelectOptionsChange, items, multiple],
+    [handleLabel, handleSelectOptionsChange],
   );
-
-  useEffect(() => {
-    const nextValue = status !== 'idle' ? value : defaultValue ?? value;
-
-    nextValue &&
-      setSelectOptions(currentOptions => {
-        const isUpdate =
-          Array.isArray(nextValue) && Array.isArray(currentOptions.value)
-            ? !array.isEqual(currentOptions.value, nextValue)
-            : currentOptions.value !== nextValue && status === 'succeeded';
-
-        isUpdate &&
-          handleMenuSelect({
-            selectedKeys: Array.isArray(nextValue) ? nextValue : [nextValue],
-          });
-
-        return { value: nextValue };
-      });
-
-    status === 'idle' && setStatus('succeeded');
-  }, [defaultValue, handleMenuSelect, status, value]);
 
   const prefixNode =
     prefix &&
@@ -204,7 +213,7 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
   const main = renderMain({
     ...childrenProps,
     ref,
-    value: selectOptions.inputValue,
+    value: selectOptions.label,
     prefix: prefixNode,
     suffix: suffixNode,
     beforeLabel: beforeLabelNode,
@@ -216,6 +225,32 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
     ...childrenProps,
     children: main,
   });
+
+  useEffect(() => {
+    const nextValue =
+      status !== 'idle' ? selectedKeys : defaultSelectedKeys ?? selectedKeys;
+
+    if (typeof nextValue !== 'undefined') {
+      setSelectOptions(currentlySelectOptions => {
+        const isUpdate = !array.isEqual(
+          currentlySelectOptions.value!,
+          nextValue,
+        );
+
+        return isUpdate
+          ? { value: nextValue, label: handleLabel(nextValue) }
+          : currentlySelectOptions;
+      });
+    }
+
+    status === 'idle' && setStatus('succeeded');
+  }, [
+    defaultSelectedKeys,
+    handleLabel,
+    handleMenuSelect,
+    selectedKeys,
+    status,
+  ]);
 
   return <>{container}</>;
 };
