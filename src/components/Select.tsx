@@ -237,6 +237,10 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
           nextValue,
         );
 
+        if (status === 'idle' && isUpdate) {
+          handleMenuSelect({ selectedKeys: nextValue });
+        }
+
         return isUpdate
           ? { value: nextValue, label: handleLabel(nextValue) }
           : currentlySelectOptions;
