@@ -92,6 +92,12 @@ export type SelectMainProps<T> = SelectChildrenProps<T> &
 
 export type SelectContainerProps<T> = SelectChildrenProps<T>;
 
+interface TreeNode {
+  label: string;
+  key: string;
+  children?: TreeNode[];
+}
+
 const Select = <T extends HTMLInputElement = HTMLInputElement>({
   ref,
   type,
@@ -146,22 +152,24 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
         items.find(item => item.key && keys.includes(item.key))?.label;
 
       const handleCascade = () => {
-        const findLabel = (
-          items = [] as BaseMenuProps<T>['items'],
-          labels = [] as string[],
-        ): string[] =>
-          items!
-            .map(({ key, label: itemLabel, children }) => {
-              const label = keys.includes(key!) ? itemLabel : undefined;
-              const nextLabels = label ? [...labels, label] : labels;
+        const findLabels = (arr: TreeNode[], target: string[]) => {
+          const result: string[] = [];
+          const traverse = (node: TreeNode) => {
+            if (target.includes(node.key)) {
+              result.push(node.label);
+            }
 
-              return children && label
-                ? findLabel(children, nextLabels)
-                : nextLabels;
-            })
-            .flat();
+            if (node.children) {
+              node.children.forEach(child => traverse(child));
+            }
+          };
 
-        return [...new Set(findLabel(items))];
+          arr.forEach(node => traverse(node));
+
+          return result;
+        };
+
+        return findLabels(items as TreeNode[], keys);
       };
 
       if (type === 'cascade') {
@@ -237,10 +245,6 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
           nextValue,
         );
 
-        if (status === 'idle' && isUpdate) {
-          handleMenuSelect({ selectedKeys: nextValue });
-        }
-
         return isUpdate
           ? { value: nextValue, label: handleLabel(nextValue) }
           : currentlySelectOptions;
@@ -248,13 +252,7 @@ const Select = <T extends HTMLInputElement = HTMLInputElement>({
     }
 
     status === 'idle' && setStatus('succeeded');
-  }, [
-    defaultSelectedKeys,
-    handleLabel,
-    handleMenuSelect,
-    selectedKeys,
-    status,
-  ]);
+  }, [defaultSelectedKeys, handleLabel, selectedKeys, status]);
 
   return <>{container}</>;
 };
